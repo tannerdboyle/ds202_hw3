@@ -1,0 +1,117 @@
+---
+title: "hw3"
+author: "Tanner Boyle"
+date: "2/19/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 1:
+
+```{r }
+library(dplyr)
+library(ggplot2)
+
+data(tips, package="reshape2")
+
+numParty <- nrow(tips)
+print(numParty)
+```
+
+# Problem 2:
+
+```{r}
+str(tips)
+```
+
+- Numeric: total_bill & tip
+
+- Factor: sex, smoker, day, and time
+
+- Integer: size
+
+# Problem 3:
+
+```{r}
+day <- tips$day
+levels(day) <- factor(c("Thur", "Fri", "Sat", "Sun"))
+
+print(day)
+```
+
+# Problem 4:
+
+```{r}
+female5 <- tips %>% 
+  filter(sex == "Female",
+         size >= 5)
+
+print(female5)
+```
+
+# Problem 5:
+
+```{r}
+tips %>% 
+  ggplot(aes(x=tip, y=total_bill)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 5)
+```
+
+Yes, it appears that there is a positive linear correlation between tip and total_bill. This makes sense, as it is American custom to frame your tip based off of a percentage of the total bill.
+
+# Problem 6:
+
+I fitted a line to show a 20% tip rate ($2 for a $10 bill). There are a few data points that are extremely far UNDER this line, meaning that the tip percentage is significantly higher than 20%. One big example of this is the data point around (5, 7.5), meaning that there was a tip of $5 on a ~$7.50 bill. There are obviously, then, opposite anomalies where the tip is significantly lower than you would expect for some of the bills. For example, there is a data point around (5, 50) -- meaning that the tip was about twice as low as a total_bill of $50 would generally indicate.
+
+# Problem 7:
+
+```{r}
+tips <- tips %>% 
+  mutate(tiprate = tip/total_bill)
+
+summary(tips$tiprate)
+```
+
+The average tiprate is 15.5%. This means that on a bill of $100, the average tip would be $15.4.
+
+# Problem 8:
+
+```{r}
+levels(tips$time) <- factor(c("Lunch", "Dinner"))
+
+tips %>% 
+  ggplot(aes(x=time, y = tiprate)) +
+  geom_boxplot()
+```
+
+The distributions of tiprate between lunch and dinner are somewhat similar. The biggest difference is that Lunch appears to have a much larger spread (both in Min/Max and in IQR) than Dinner. Q3 is very similar between the two, although Q1 for Dinner is higher. This means that the middle 50% of tiprates for Dinner are, on average, higher than they are for lunch.
+
+# Problem 9:
+
+```{r}
+tips %>% 
+  ggplot(aes(x=tip, y=total_bill, colour = sex)) +
+  geom_point() +
+  facet_wrap(smoker~.) +
+  geom_abline(intercept = 0, slope = 10/1.55)
+```
+
+In general, it appears like the Smoker data is more spread out (more variability) and the Non-Smoker data is tighter together (less variability). Men appear to have the maximum data points in both categories and women appear to have the lowest. The eye test shows that, typically, higher total_bill is correlated with men choosing to pay, while lower total_bill numbers don't seem to be strongly correlated with either gender, necessarily.
+
+# Problem 10:
+
+```{r}
+tips %>% 
+  ggplot(aes(x=sex)) +
+  geom_bar() +
+  facet_wrap(day~.)
+```
+
+
+Men appear to vastly outpay women on Saturday and Sunday, while Friday and Thursday it appears to be relatively even. The only day that women outpay men (in terms of # of checks paid for) appears to be Thursday.
+
+
